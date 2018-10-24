@@ -1,17 +1,22 @@
 import jinja2
 import os
 import webapp2
+import logging
+import json
 
 template_env = jinja2.Environment(
-    loader = jinja2.FileSystemLoader(os.getcwd())  # Get the templates in current directory
+    loader=jinja2.FileSystemLoader(os.getcwd())  # Get the templates in current directory
 )
+
 
 class MainPage(webapp2.RequestHandler):
     def post(self):
-        recieved_data = self.request.get('challenge')
+        data = json.loads(self.request.body)
+        #data = json.loads(data)
+        #logging.info("The data = " + str(data['challenge']))
         template = template_env.get_template('auth.html')
         context = {
-            'data': recieved_data,
+            'data': data['challenge'],
         }
         self.response.out.write(template.render(context))
 
