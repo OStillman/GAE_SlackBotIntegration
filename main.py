@@ -26,18 +26,6 @@ class MainPage(webapp2.RequestHandler):
                     "channel": "CDMKMFHHU"
                 })
                 sendJSON(send_data)
-            elif (data['event']['text'].find("Who's there?") != -1):
-                send_data = json.dumps({
-                    "text": "A Bot user",
-                    "channel": "CDMKMFHHU"
-                })
-                sendJSON(send_data)
-            elif (data['event']['text'].find("Bot user who?") != -1):
-                send_data = json.dumps({
-                    "text": "No. I'm a bot user. I don't understand jokes!",
-                    "channel": "CDMKMFHHU"
-                })
-                sendJSON(send_data)
             else:
                 logging.info("No Tell me a joke there")
                 send_data = json.dumps({
@@ -45,10 +33,23 @@ class MainPage(webapp2.RequestHandler):
                     "channel": "CDMKMFHHU"
                 })
                 sendJSON(send_data)
+        if (data['event']['text'].lower().find("who's there?") != -1):
+            send_data = json.dumps({
+                "text": "A Bot user",
+                "channel": "CDMKMFHHU"
+            })
+            sendJSON(send_data)
+        if (data['event']['text'].lower().find("bot user who?") != -1):
+            send_data = json.dumps({
+                "text": "No. I'm a bot user. I don't understand jokes!",
+                "channel": "CDMKMFHHU"
+            })
+            sendJSON(send_data)
         context = {
             'data': data,
         }
         self.response.out.write(template.render(context))
+
 
 def sendJSON(send_data):
     try:
