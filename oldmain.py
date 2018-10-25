@@ -6,16 +6,10 @@ import json
 import urllib
 
 from google.appengine.api import urlfetch
-from google.appengine.ext import ndb
 
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.getcwd())  # Get the templates in current directory
 )
-
-
-class Progress(ndb.Model):
-    user = ndb.StringProperty()
-    status = ndb.StringProperty()
 
 
 class MainPage(webapp2.RequestHandler):
@@ -27,17 +21,8 @@ class MainPage(webapp2.RequestHandler):
         if (data['event']['type'] == "app_mention"):
             if (data['event']['text'].find("tell me a joke") != -1):
                 logging.info("Recieved Tell me a joke")
-                user = data['event']['user']
-                user_status_query = Progress.query().filter(Progress.user == user)
-                user_status = user_status_query.get()
-                if(user_status):
-                    user_status.status = "Asked"
-                    user_status.put()
-                else:
-                    progress_details = Progress(user=user, status="Asked")
-                    progress_details.put()
                 send_data = json.dumps({
-                    "text": "Hello <@" + user + ">! Knock, knock.",
+                    "text": "Hello! Knock, knock.",
                     "channel": "CDMKMFHHU"
                 })
                 sendJSON(send_data)
@@ -48,29 +33,18 @@ class MainPage(webapp2.RequestHandler):
                     "channel": "CDMKMFHHU"
                 })
                 sendJSON(send_data)
-
         if (data['event']['text'].lower().find("who's there?") != -1):
-            received_user = data['event']['user']
-            q = Progress.query().filter(Progress.status == "Asked")
-            for status_result in q:
-                if (status_result.user == received_user):
-                    status_result.status = "who"
-                    status_result.put()
-                    send_data = json.dumps({
-                        "text": "A Bot user",
-                        "channel": "CDMKMFHHU"
-                    })
-                    sendJSON(send_data)
-        if (data['event']['text'].lower().find("a bot user who?") != -1):
-            received_user = data['event']['user']
-            q = Progress.query().filter(Progress.status == "who")
-            for status_result in q:
-                if (status_result.user == received_user):
-                    send_data = json.dumps({
-                        "text": "No. I'm a bot user. I don't understand jokes!",
-                        "channel": "CDMKMFHHU"
-                    })
-                    sendJSON(send_data)
+            send_data = json.dumps({
+                "text": "A Bot user",
+                "channel": "CDMKMFHHU"
+            })
+            sendJSON(send_data)
+        if (data['event']['text'].lower().find("bot user who?") != -1):
+            send_data = json.dumps({
+                "text": "No. I'm a bot user. I don't understand jokes!",
+                "channel": "CDMKMFHHU"
+            })
+            sendJSON(send_data)
         context = {
             'data': data,
         }
